@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-import { findDatabases, queryAnnotations, groupByBook, filterAnnotations } from "./database.js";
-import { exportToMarkdown, exportToSingleMarkdown } from "./exporters/markdown.js";
-import { exportToJson } from "./exporters/json.js";
-import { exportToCsv } from "./exporters/csv.js";
-import { exportToHtml } from "./exporters/html.js";
-import type { ExportFormat, AnnotationColor } from "./types.js";
+import { findDatabases, queryAnnotations, groupByBook, filterAnnotations } from './database.js';
+import { exportToMarkdown, exportToSingleMarkdown } from './exporters/markdown.js';
+import { exportToJson } from './exporters/json.js';
+import { exportToCsv } from './exporters/csv.js';
+import { exportToHtml } from './exporters/html.js';
+import type { ExportFormat, AnnotationColor } from './types.js';
 
 interface CliOptions {
   format: ExportFormat;
@@ -21,7 +21,7 @@ interface CliOptions {
   help: boolean;
 }
 
-function printHelp() {
+function printHelp(): void {
   console.log(`
 Apple Books Export Tool
 Export highlights, bookmarks, and notes from Apple Books
@@ -81,7 +81,7 @@ function parseArgs(): CliOptions {
   };
 
   // Check for positional format argument (first arg without --)
-  if (args.length > 0 && !args[0].startsWith('--')) {
+  if (args.length > 0 && args[0] && !args[0].startsWith('--')) {
     const formatArg = args[0].toLowerCase();
     if (['html', 'markdown', 'json', 'csv'].includes(formatArg)) {
       options.format = formatArg as ExportFormat;
@@ -105,7 +105,7 @@ function parseArgs(): CliOptions {
 
       case '--output':
       case '-o':
-        options.output = args[++i];
+        options.output = args[++i] ?? '';
         break;
 
       case '--single-file':
@@ -129,7 +129,7 @@ function parseArgs(): CliOptions {
         break;
 
       case '--colors':
-        options.colors = args[++i].split(',') as AnnotationColor[];
+        options.colors = (args[++i] ?? '').split(',') as AnnotationColor[];
         break;
 
       case '--annotations-db':
@@ -163,12 +163,31 @@ function parseArgs(): CliOptions {
   return options;
 }
 
-async function main() {
+async function main(): Promise<void> {
   const options = parseArgs();
 
   if (options.help) {
     printHelp();
     process.exit(0);
+  }
+
+  // Validate colors argument
+  if (options.colors) {
+    const validColors = ['yellow', 'green', 'blue', 'pink', 'purple', 'underline'];
+    const invalidColors = options.colors.filter((c) => !validColors.includes(c));
+    if (invalidColors.length > 0) {
+      console.error(`❌ Invalid colors: ${invalidColors.join(', ')}`);
+      console.error(`   Valid colors: ${validColors.join(', ')}`);
+      process.exit(1);
+    }
+  }
+
+  // Validate format
+  const validFormats = ['html', 'markdown', 'json', 'csv'];
+  if (!validFormats.includes(options.format)) {
+    console.error(`❌ Invalid format: ${options.format}`);
+    console.error(`   Valid formats: ${validFormats.join(', ')}`);
+    process.exit(1);
   }
 
   console.log('🍎 Apple Books Export Tool\n');
@@ -199,15 +218,17 @@ async function main() {
     const includeBookmarks = options.includeBookmarks || options.bookmarksOnly;
     const includeNotes = !options.highlightsOnly && !options.bookmarksOnly;
 
-    const filteredBooks = allBooks.map(book => ({
-      ...book,
-      annotations: filterAnnotations(book.annotations, {
-        includeHighlights,
-        includeBookmarks,
-        includeNotes,
-        colorFilters: options.colors,
-      }),
-    })).filter(book => book.annotations.length > 0);
+    const filteredBooks = allBooks
+      .map((book) => ({
+        ...book,
+        annotations: filterAnnotations(book.annotations, {
+          includeHighlights,
+          includeBookmarks,
+          includeNotes,
+          colorFilters: options.colors,
+        }),
+      }))
+      .filter((book) => book.annotations.length > 0);
 
     if (filteredBooks.length === 0) {
       console.log('⚠️  No annotations match the specified filters');
@@ -220,15 +241,15 @@ async function main() {
     console.log(`  • Annotations: ${totalAnnotations}`);
 
     const highlights = filteredBooks.reduce(
-      (sum, book) => sum + book.annotations.filter(a => a.type === 'highlight').length,
+      (sum, book) => sum + book.annotations.filter((a) => a.type === 'highlight').length,
       0
     );
     const bookmarks = filteredBooks.reduce(
-      (sum, book) => sum + book.annotations.filter(a => a.type === 'bookmark').length,
+      (sum, book) => sum + book.annotations.filter((a) => a.type === 'bookmark').length,
       0
     );
     const notes = filteredBooks.reduce(
-      (sum, book) => sum + book.annotations.filter(a => a.type === 'note').length,
+      (sum, book) => sum + book.annotations.filter((a) => a.type === 'note').length,
       0
     );
 
@@ -236,7 +257,7 @@ async function main() {
     if (bookmarks > 0) console.log(`    - Bookmarks: ${bookmarks}`);
     if (notes > 0) console.log(`    - Notes: ${notes}`);
 
-    const orphaned = allBooks.filter(book => !book.title).length;
+    const orphaned = allBooks.filter((book) => !book.title).length;
     if (orphaned > 0) {
       console.log(`    - Orphaned annotations: ${orphaned} books`);
     }
@@ -283,7 +304,6 @@ async function main() {
     }
 
     console.log('\n✅ Export complete!\n');
-
   } catch (error) {
     console.error('\n❌ Error:', error instanceof Error ? error.message : error);
     process.exit(1);

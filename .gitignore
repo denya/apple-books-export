@@ -4,12 +4,10 @@ bun.lockb
 
 # Build output
 dist/
-*.exe
 
 # Export output
 exports/
 *.csv
-*.md
 !README.md
 !package.json
 !tsconfig.json
@@ -27,3 +25,4 @@ Thumbs.db
 
 # Test files
 test-*
+coverage/

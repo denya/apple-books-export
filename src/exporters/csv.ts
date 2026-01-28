@@ -1,6 +1,6 @@
-import { writeFileSync, mkdirSync } from "fs";
-import { dirname } from "path";
-import type { Book } from "../types.js";
+import { writeFileSync, mkdirSync } from 'fs';
+import { dirname } from 'path';
+import type { Book } from '../types.js';
 
 /**
  * Escape CSV field value
@@ -77,6 +77,13 @@ export function exportToCsv(books: Book[], outputPath: string): string {
     }
   }
 
-  writeFileSync(outputPath, csv, 'utf-8');
+  try {
+    writeFileSync(outputPath, csv, 'utf-8');
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to write file to ${outputPath}: ${error.message}`);
+    }
+    throw error;
+  }
   return outputPath;
 }

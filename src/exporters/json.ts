@@ -1,11 +1,15 @@
-import { writeFileSync, mkdirSync } from "fs";
-import { join, dirname } from "path";
-import type { Book } from "../types.js";
+import { writeFileSync, mkdirSync } from 'fs';
+import { join, dirname } from 'path';
+import type { Book } from '../types.js';
 
 /**
  * Export all books to a single JSON file
  */
-export function exportToJson(books: Book[], outputPath: string, singleFile: boolean = true): string | string[] {
+export function exportToJson(
+  books: Book[],
+  outputPath: string,
+  singleFile: boolean = true
+): string | string[] {
   if (singleFile) {
     return exportToSingleJson(books, outputPath);
   } else {
@@ -22,15 +26,15 @@ function exportToSingleJson(books: Book[], outputPath: string): string {
 
   const totalAnnotations = books.reduce((sum, book) => sum + book.annotations.length, 0);
   const totalHighlights = books.reduce(
-    (sum, book) => sum + book.annotations.filter(a => a.type === 'highlight').length,
+    (sum, book) => sum + book.annotations.filter((a) => a.type === 'highlight').length,
     0
   );
   const totalBookmarks = books.reduce(
-    (sum, book) => sum + book.annotations.filter(a => a.type === 'bookmark').length,
+    (sum, book) => sum + book.annotations.filter((a) => a.type === 'bookmark').length,
     0
   );
   const totalNotes = books.reduce(
-    (sum, book) => sum + book.annotations.filter(a => a.type === 'note').length,
+    (sum, book) => sum + book.annotations.filter((a) => a.type === 'note').length,
     0
   );
 
@@ -43,13 +47,13 @@ function exportToSingleJson(books: Book[], outputPath: string): string {
       bookmarks: totalBookmarks,
       notes: totalNotes,
     },
-    books: books.map(book => ({
+    books: books.map((book) => ({
       assetId: book.assetId,
       title: book.title,
       author: book.author,
       genre: book.genre,
       annotationCount: book.annotations.length,
-      annotations: book.annotations.map(ann => ({
+      annotations: book.annotations.map((ann) => ({
         id: ann.id,
         type: ann.type,
         color: ann.color,
@@ -64,7 +68,14 @@ function exportToSingleJson(books: Book[], outputPath: string): string {
   };
 
   const json = JSON.stringify(exportData, null, 2);
-  writeFileSync(outputPath, json, 'utf-8');
+  try {
+    writeFileSync(outputPath, json, 'utf-8');
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to write file to ${outputPath}: ${error.message}`);
+    }
+    throw error;
+  }
 
   return outputPath;
 }
@@ -103,7 +114,7 @@ function exportToMultipleJson(books: Book[], outputDir: string): string[] {
       genre: book.genre,
       exported: new Date().toISOString(),
       annotationCount: book.annotations.length,
-      annotations: book.annotations.map(ann => ({
+      annotations: book.annotations.map((ann) => ({
         id: ann.id,
         type: ann.type,
         color: ann.color,
@@ -117,7 +128,14 @@ function exportToMultipleJson(books: Book[], outputDir: string): string[] {
     };
 
     const json = JSON.stringify(bookData, null, 2);
-    writeFileSync(filepath, json, 'utf-8');
+    try {
+      writeFileSync(filepath, json, 'utf-8');
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to write file to ${filepath}: ${error.message}`);
+      }
+      throw error;
+    }
     filepaths.push(filepath);
   }
 

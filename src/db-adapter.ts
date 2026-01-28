@@ -6,6 +6,7 @@
  * - Node.js's better-sqlite3 (auto-installed)
  */
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type QueryResult = any[];
 
 interface DatabaseInterface {
@@ -18,7 +19,8 @@ interface DatabaseInterface {
  * Detect runtime environment
  */
 function isBunRuntime(): boolean {
-  return typeof (globalThis as any).Bun !== "undefined";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return typeof (globalThis as any).Bun !== 'undefined';
 }
 
 /**
@@ -27,9 +29,11 @@ function isBunRuntime(): boolean {
  * This uses a factory pattern since constructors can't be async.
  */
 export class Database implements DatabaseInterface {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private db: any;
   private isBun: boolean;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private constructor(db: any, isBun: boolean) {
     this.db = db;
     this.isBun = isBun;
@@ -50,6 +54,7 @@ export class Database implements DatabaseInterface {
     } else {
       // Node.js runtime - use better-sqlite3
       // Dynamic import works in ESM
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const BetterSqlite3Module: any = await import('better-sqlite3');
       const BetterSqlite3 = BetterSqlite3Module.default || BetterSqlite3Module;
       const db = new BetterSqlite3(path, options);
@@ -57,14 +62,14 @@ export class Database implements DatabaseInterface {
     }
   }
 
-  query(sql: string) {
+  query(sql: string): { all(): QueryResult } {
     if (this.isBun) {
       // Bun: db.query(sql).all()
       return this.db.query(sql);
     } else {
       // Node.js: db.prepare(sql).all()
       return {
-        all: () => this.db.prepare(sql).all()
+        all: (): QueryResult => this.db.prepare(sql).all(),
       };
     }
   }

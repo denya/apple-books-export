@@ -1,6 +1,6 @@
-import { writeFileSync, mkdirSync } from "fs";
-import { join, dirname } from "path";
-import type { Book, Annotation } from "../types.js";
+import { writeFileSync, mkdirSync } from 'fs';
+import { join, dirname } from 'path';
+import type { Book, Annotation } from '../types.js';
 
 const COLOR_EMOJI: Record<string, string> = {
   yellow: '🟡',
@@ -31,7 +31,7 @@ function sanitizeFilename(filename: string): string {
 /**
  * Format a single annotation as markdown
  */
-function formatAnnotation(annotation: Annotation, index: number): string {
+function formatAnnotation(annotation: Annotation): string {
   const colorEmoji = COLOR_EMOJI[annotation.color] || '⚪';
   const typeEmoji = TYPE_EMOJI[annotation.type] || '📄';
 
@@ -46,7 +46,7 @@ function formatAnnotation(annotation: Annotation, index: number): string {
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })}\n`;
 
   if (annotation.text) {
@@ -75,9 +75,9 @@ export function exportBookToMarkdown(book: Book, outputDir: string): string {
   const filepath = join(outputDir, filename);
 
   // Count annotation types
-  const highlights = book.annotations.filter(a => a.type === 'highlight').length;
-  const bookmarks = book.annotations.filter(a => a.type === 'bookmark').length;
-  const notes = book.annotations.filter(a => a.type === 'note').length;
+  const highlights = book.annotations.filter((a) => a.type === 'highlight').length;
+  const bookmarks = book.annotations.filter((a) => a.type === 'bookmark').length;
+  const notes = book.annotations.filter((a) => a.type === 'note').length;
 
   // Build YAML frontmatter
   let content = '---\n';
@@ -102,12 +102,19 @@ export function exportBookToMarkdown(book: Book, outputDir: string): string {
   content += `\n*${book.annotations.length} annotations*\n`;
 
   // Add annotations
-  book.annotations.forEach((annotation, index) => {
-    content += formatAnnotation(annotation, index);
+  book.annotations.forEach((annotation) => {
+    content += formatAnnotation(annotation);
   });
 
   // Write file
-  writeFileSync(filepath, content, 'utf-8');
+  try {
+    writeFileSync(filepath, content, 'utf-8');
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to write file to ${filepath}: ${error.message}`);
+    }
+    throw error;
+  }
 
   return filepath;
 }
@@ -137,15 +144,15 @@ export function exportToSingleMarkdown(books: Book[], outputPath: string): strin
 
   const totalAnnotations = books.reduce((sum, book) => sum + book.annotations.length, 0);
   const totalHighlights = books.reduce(
-    (sum, book) => sum + book.annotations.filter(a => a.type === 'highlight').length,
+    (sum, book) => sum + book.annotations.filter((a) => a.type === 'highlight').length,
     0
   );
   const totalBookmarks = books.reduce(
-    (sum, book) => sum + book.annotations.filter(a => a.type === 'bookmark').length,
+    (sum, book) => sum + book.annotations.filter((a) => a.type === 'bookmark').length,
     0
   );
   const totalNotes = books.reduce(
-    (sum, book) => sum + book.annotations.filter(a => a.type === 'note').length,
+    (sum, book) => sum + book.annotations.filter((a) => a.type === 'note').length,
     0
   );
 
@@ -173,13 +180,20 @@ export function exportToSingleMarkdown(books: Book[], outputPath: string): strin
     }
     content += `\n*${book.annotations.length} annotations*\n`;
 
-    book.annotations.forEach((annotation, index) => {
-      content += formatAnnotation(annotation, index);
+    book.annotations.forEach((annotation) => {
+      content += formatAnnotation(annotation);
     });
 
     content += '\n\n';
   }
 
-  writeFileSync(outputPath, content, 'utf-8');
+  try {
+    writeFileSync(outputPath, content, 'utf-8');
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to write file to ${outputPath}: ${error.message}`);
+    }
+    throw error;
+  }
   return outputPath;
 }

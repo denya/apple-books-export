@@ -1,12 +1,12 @@
-import { Database } from "./db-adapter.js";
-import { homedir } from "os";
-import { join } from "path";
-import { existsSync, readdirSync } from "fs";
-import type { Annotation, Book, RawAnnotation, AnnotationType, AnnotationColor } from "./types.js";
+import { Database } from './db-adapter.js';
+import { homedir } from 'os';
+import { join } from 'path';
+import { existsSync, readdirSync } from 'fs';
+import type { Annotation, Book, RawAnnotation, AnnotationType, AnnotationColor } from './types.js';
 
 const APPLE_BOOKS_CONTAINER = join(
   homedir(),
-  "Library/Containers/com.apple.iBooksX/Data/Documents"
+  'Library/Containers/com.apple.iBooksX/Data/Documents'
 );
 
 /**
@@ -77,36 +77,36 @@ export function findDatabases(customPaths?: { annotations?: string; library?: st
   }
 
   // Find AEAnnotation database
-  const annotationsDir = join(APPLE_BOOKS_CONTAINER, "AEAnnotation");
+  const annotationsDir = join(APPLE_BOOKS_CONTAINER, 'AEAnnotation');
   if (!existsSync(annotationsDir)) {
     throw new Error(`Annotations directory not found: ${annotationsDir}`);
   }
 
-  const annotationFiles = readdirSync(annotationsDir).filter(f =>
-    f.startsWith("AEAnnotation_") && f.endsWith(".sqlite")
+  const annotationFiles = readdirSync(annotationsDir).filter(
+    (f) => f.startsWith('AEAnnotation_') && f.endsWith('.sqlite')
   );
 
   if (annotationFiles.length === 0) {
     throw new Error(`No annotation database found in ${annotationsDir}`);
   }
 
-  const annotationsDb = join(annotationsDir, annotationFiles[0]);
+  const annotationsDb = join(annotationsDir, annotationFiles[0]!);
 
   // Find BKLibrary database
-  const libraryDir = join(APPLE_BOOKS_CONTAINER, "BKLibrary");
+  const libraryDir = join(APPLE_BOOKS_CONTAINER, 'BKLibrary');
   if (!existsSync(libraryDir)) {
     throw new Error(`Library directory not found: ${libraryDir}`);
   }
 
-  const libraryFiles = readdirSync(libraryDir).filter(f =>
-    f.startsWith("BKLibrary") && f.endsWith(".sqlite")
+  const libraryFiles = readdirSync(libraryDir).filter(
+    (f) => f.startsWith('BKLibrary') && f.endsWith('.sqlite')
   );
 
   if (libraryFiles.length === 0) {
     throw new Error(`No library database found in ${libraryDir}`);
   }
 
-  const libraryDb = join(libraryDir, libraryFiles[0]);
+  const libraryDb = join(libraryDir, libraryFiles[0]!);
 
   return { annotationsDb, libraryDb };
 }
@@ -154,7 +154,7 @@ export async function queryAnnotations(
  * Transform raw annotations into structured Annotation objects
  */
 export function transformAnnotations(rawAnnotations: RawAnnotation[]): Annotation[] {
-  return rawAnnotations.map(raw => {
+  return rawAnnotations.map((raw) => {
     const type = determineAnnotationType(raw);
     const { color } = mapAnnotationStyle(raw.style);
 
@@ -223,7 +223,7 @@ export function filterAnnotations(
     colorFilters?: string[];
   }
 ): Annotation[] {
-  return annotations.filter(ann => {
+  return annotations.filter((ann) => {
     // Filter by type
     if (ann.type === 'highlight' && !options.includeHighlights) return false;
     if (ann.type === 'bookmark' && !options.includeBookmarks) return false;

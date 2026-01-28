@@ -798,7 +798,14 @@ ${renderBookIndex(books)}
 
   // Write to file
   const resolvedPath = resolve(outputPath);
-  writeFileSync(resolvedPath, html, 'utf-8');
+  try {
+    writeFileSync(resolvedPath, html, 'utf-8');
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to write file to ${resolvedPath}: ${error.message}`);
+    }
+    throw error;
+  }
 
   return resolvedPath;
 }

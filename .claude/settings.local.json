@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebSearch",
+      "WebFetch(domain:api.github.com)",
+      "Bash(sqlite3:*)",
+      "Bash(python3:*)",
+      "Bash(node:*)",
+      "Bash(bun -e:*)",
+      "Bash(bun install)",
+      "Bash(bun run export:*)",
+      "Bash(git commit:*)",
+      "Bash(gh repo create:*)",
+      "Bash(git push:*)",
+      "Bash(bun run build)",
+      "Bash(bun install:*)",
+      "Bash(bun:*)",
+      "Bash(./dist/index.js export:*)",
+      "Bash(bun run:*)",
+      "Bash(open:*)",
+      "Bash(npm run build:*)",
+      "Bash(find:*)",
+      "Bash(npm view:*)",
+      "Bash(swift build:*)"
+    ]
+  }
+}
