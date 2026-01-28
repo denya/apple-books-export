@@ -1,5 +1,9 @@
 # Apple Books Export
 
+[![npm version](https://badge.fury.io/js/apple-books-export.svg)](https://www.npmjs.com/package/apple-books-export)
+[![npm downloads](https://img.shields.io/npm/dm/apple-books-export.svg)](https://www.npmjs.com/package/apple-books-export)
+[![license](https://img.shields.io/npm/l/apple-books-export.svg)](https://github.com/denya/apple-books-export/blob/main/LICENSE)
+
 Export all your highlights, bookmarks, and notes from Apple Books on macOS.
 
 ## What is this?
