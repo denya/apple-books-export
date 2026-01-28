@@ -72,11 +72,51 @@ Common options:
 - `--highlights-only` - Skip bookmarks and notes
 - `--colors yellow,green` - Only export specific highlight colors
 
+## Performance Tips
+
+### Use Bun for Fastest Experience
+```bash
+bunx apple-books-export  # Zero dependencies, instant launch
+```
+
+Bun includes built-in SQLite support, so there's no installation overhead.
+
+### Use Node.js 22.5+ for Zero Dependencies
+```bash
+npx apple-books-export  # Instant install, no native compilation
+```
+
+Node.js 22.5+ includes built-in SQLite support. This means:
+- No compilation during install
+- 26MB smaller installation size
+- 5-15 seconds faster install time
+- Zero dependencies
+
+### Node.js 18-22.4 Users
+```bash
+npx apple-books-export  # Works, but installs better-sqlite3
+```
+
+Older Node.js versions automatically use `better-sqlite3`, which requires:
+- Build tools (Xcode Command Line Tools on macOS)
+- Native compilation during install
+- ~26MB additional disk space
+
 ## Troubleshooting
 
 **"Database not found"** - Make sure you have Apple Books installed and have created at least one highlight or bookmark.
 
 **No highlights exported** - Check that you're not using filters that exclude all your highlights (e.g., `--colors pink` when you only have yellow highlights).
+
+**"No SQLite implementation available"** (Node.js <22.5) - Install better-sqlite3:
+```bash
+npm install better-sqlite3
+```
+
+If installation fails, ensure you have build tools installed:
+```bash
+xcode-select --install
+```
 
 ## License
 

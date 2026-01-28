@@ -48,7 +48,8 @@
   "bugs": {
     "url": "https://github.com/denya/apple-books-export/issues"
   },
-  "dependencies": {
+  "dependencies": {},
+  "optionalDependencies": {
     "better-sqlite3": "^11.10.0"
   },
   "engines": {
