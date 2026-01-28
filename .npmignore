@@ -1,0 +1,12 @@
+src/
+tsconfig.json
+.git/
+.gitignore
+node_modules/
+bun.lock
+exports/
+*.md
+!README.md
+.vscode/
+.idea/
+.claude/
