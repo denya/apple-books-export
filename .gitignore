@@ -8,10 +8,11 @@ dist/
 
 # Export output
 exports/
-*.json
 *.csv
 *.md
 !README.md
+!package.json
+!tsconfig.json
 
 # OS
 .DS_Store

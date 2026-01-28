@@ -1,0 +1,48 @@
+{
+  "name": "apple-books-export",
+  "version": "1.0.1",
+  "description": "Export highlights, bookmarks, and notes from Apple Books",
+  "type": "module",
+  "bin": {
+    "apple-books-export": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "export": "bun run src/index.ts",
+    "dev": "bun run src/index.ts",
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test:local": "npm run build && node ./dist/index.js --help",
+    "test:bun": "npm run build && bun ./dist/index.js --help"
+  },
+  "keywords": [
+    "apple-books",
+    "export",
+    "highlights",
+    "notes",
+    "bookmarks",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.10.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "os": [
+    "darwin"
+  ],
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/bun": "latest",
+    "typescript": "^5.9.3"
+  }
+}

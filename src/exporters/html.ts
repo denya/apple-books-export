@@ -1,4 +1,6 @@
 import type { Book, Annotation } from '../types.js';
+import { writeFileSync } from 'fs';
+import { resolve } from 'path';
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString('en-US', {
@@ -795,11 +797,8 @@ ${renderBookIndex(books)}
 `;
 
   // Write to file
-  const fs = require('fs');
-  const path = require('path');
-
-  const resolvedPath = path.resolve(outputPath);
-  fs.writeFileSync(resolvedPath, html, 'utf-8');
+  const resolvedPath = resolve(outputPath);
+  writeFileSync(resolvedPath, html, 'utf-8');
 
   return resolvedPath;
 }
