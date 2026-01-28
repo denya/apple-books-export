@@ -1,4 +1,4 @@
-import type { Book, Annotation } from '../types';
+import type { Book, Annotation } from '../types.js';
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString('en-US', {
@@ -751,9 +751,9 @@ ${renderBookIndex(books)}
           target.classList.remove('collapsed');
           localStorage.setItem('book-' + target.id, 'expanded');
 
-          // Smooth scroll
+          // Instant scroll
           target.scrollIntoView({
-            behavior: 'smooth',
+            behavior: 'instant',
             block: 'start'
           });
 

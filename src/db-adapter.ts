@@ -14,54 +14,6 @@ interface DatabaseInterface {
   close(): void;
 }
 
-class BunDatabaseAdapter implements DatabaseInterface {
-  private db: any;
-
-  constructor(path: string, options?: { readonly?: boolean }) {
-    // Dynamic import of bun:sqlite
-    const { Database: BunDatabase } = require("bun:sqlite");
-    this.db = new BunDatabase(path, options);
-  }
-
-  query(sql: string) {
-    return this.db.query(sql);
-  }
-
-  run(sql: string): void {
-    this.db.run(sql);
-  }
-
-  close(): void {
-    this.db.close();
-  }
-}
-
-class NodeDatabaseAdapter implements DatabaseInterface {
-  private db: any;
-
-  constructor(path: string, options?: { readonly?: boolean }) {
-    // Dynamic import of better-sqlite3
-    const BetterSqlite3 = require("better-sqlite3");
-    this.db = new BetterSqlite3(path, options);
-  }
-
-  query(sql: string) {
-    // better-sqlite3 uses prepare().all() instead of query().all()
-    return {
-      all: () => this.db.prepare(sql).all()
-    };
-  }
-
-  run(sql: string): void {
-    // better-sqlite3 uses prepare().run() instead of run()
-    this.db.prepare(sql).run();
-  }
-
-  close(): void {
-    this.db.close();
-  }
-}
-
 /**
  * Detect runtime environment
  */
@@ -71,27 +23,63 @@ function isBunRuntime(): boolean {
 
 /**
  * Unified Database class that works in both Bun and Node.js
+ *
+ * This uses a factory pattern since constructors can't be async.
  */
 export class Database implements DatabaseInterface {
-  private adapter: DatabaseInterface;
+  private db: any;
+  private isBun: boolean;
 
-  constructor(path: string, options?: { readonly?: boolean }) {
-    if (isBunRuntime()) {
-      this.adapter = new BunDatabaseAdapter(path, options);
+  private constructor(db: any, isBun: boolean) {
+    this.db = db;
+    this.isBun = isBun;
+  }
+
+  /**
+   * Create a new Database instance (async factory)
+   */
+  static async create(path: string, options?: { readonly?: boolean }): Promise<Database> {
+    const isBun = isBunRuntime();
+
+    if (isBun) {
+      // Bun runtime - use built-in bun:sqlite
+      // Dynamic import works in both runtimes
+      const { Database: BunDB } = await import('bun:sqlite');
+      const db = new BunDB(path, options);
+      return new Database(db, isBun);
     } else {
-      this.adapter = new NodeDatabaseAdapter(path, options);
+      // Node.js runtime - use better-sqlite3
+      // Dynamic import works in ESM
+      const BetterSqlite3Module: any = await import('better-sqlite3');
+      const BetterSqlite3 = BetterSqlite3Module.default || BetterSqlite3Module;
+      const db = new BetterSqlite3(path, options);
+      return new Database(db, isBun);
     }
   }
 
   query(sql: string) {
-    return this.adapter.query(sql);
+    if (this.isBun) {
+      // Bun: db.query(sql).all()
+      return this.db.query(sql);
+    } else {
+      // Node.js: db.prepare(sql).all()
+      return {
+        all: () => this.db.prepare(sql).all()
+      };
+    }
   }
 
   run(sql: string): void {
-    this.adapter.run(sql);
+    if (this.isBun) {
+      // Bun: db.run(sql)
+      this.db.run(sql);
+    } else {
+      // Node.js: db.prepare(sql).run()
+      this.db.prepare(sql).run();
+    }
   }
 
   close(): void {
-    this.adapter.close();
+    this.db.close();
   }
 }

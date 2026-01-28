@@ -1,6 +1,6 @@
 import { writeFileSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
-import type { Book } from "../types";
+import type { Book } from "../types.js";
 
 /**
  * Export all books to a single JSON file

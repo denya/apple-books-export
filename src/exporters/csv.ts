@@ -1,6 +1,6 @@
 import { writeFileSync, mkdirSync } from "fs";
 import { dirname } from "path";
-import type { Book } from "../types";
+import type { Book } from "../types.js";
 
 /**
  * Escape CSV field value

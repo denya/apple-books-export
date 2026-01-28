@@ -2,7 +2,7 @@ import { Database } from "./db-adapter.js";
 import { homedir } from "os";
 import { join } from "path";
 import { existsSync, readdirSync } from "fs";
-import type { Annotation, Book, RawAnnotation, AnnotationType, AnnotationColor } from "./types";
+import type { Annotation, Book, RawAnnotation, AnnotationType, AnnotationColor } from "./types.js";
 
 const APPLE_BOOKS_CONTAINER = join(
   homedir(),
@@ -114,11 +114,11 @@ export function findDatabases(customPaths?: { annotations?: string; library?: st
 /**
  * Query all annotations with book metadata
  */
-export function queryAnnotations(
+export async function queryAnnotations(
   annotationsDbPath: string,
   libraryDbPath: string
-): RawAnnotation[] {
-  const annotationsDb = new Database(annotationsDbPath, { readonly: true });
+): Promise<RawAnnotation[]> {
+  const annotationsDb = await Database.create(annotationsDbPath, { readonly: true });
 
   // Attach the library database
   annotationsDb.run(`ATTACH DATABASE '${libraryDbPath}' AS library`);

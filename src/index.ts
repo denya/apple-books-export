@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-import { findDatabases, queryAnnotations, groupByBook, filterAnnotations } from "./database";
-import { exportToMarkdown, exportToSingleMarkdown } from "./exporters/markdown";
-import { exportToJson } from "./exporters/json";
-import { exportToCsv } from "./exporters/csv";
-import { exportToHtml } from "./exporters/html";
-import type { ExportFormat, AnnotationColor } from "./types";
+import { findDatabases, queryAnnotations, groupByBook, filterAnnotations } from "./database.js";
+import { exportToMarkdown, exportToSingleMarkdown } from "./exporters/markdown.js";
+import { exportToJson } from "./exporters/json.js";
+import { exportToCsv } from "./exporters/csv.js";
+import { exportToHtml } from "./exporters/html.js";
+import type { ExportFormat, AnnotationColor } from "./types.js";
 
 interface CliOptions {
   format: ExportFormat;
@@ -186,7 +186,7 @@ async function main() {
 
     // Query annotations
     console.log('🔍 Reading annotations...');
-    const rawAnnotations = queryAnnotations(annotationsDb, libraryDb);
+    const rawAnnotations = await queryAnnotations(annotationsDb, libraryDb);
     console.log(`  ✓ Found ${rawAnnotations.length} annotations\n`);
 
     // Group by book

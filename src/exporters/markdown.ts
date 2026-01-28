@@ -1,6 +1,6 @@
 import { writeFileSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
-import type { Book, Annotation } from "../types";
+import type { Book, Annotation } from "../types.js";
 
 const COLOR_EMOJI: Record<string, string> = {
   yellow: '🟡',
